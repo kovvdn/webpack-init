@@ -1,0 +1,13 @@
+@import "mixins/_font-face.scss";
+
+@import "base/fonts";
+
+body {
+  background-color: lightblue;
+  font-family: notosans;
+  background-image: url("../images/bg.jpg");
+  a {
+    color: indianred;
+    text-decoration: none;
+  }
+}

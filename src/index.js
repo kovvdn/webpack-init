@@ -1,3 +1,4 @@
-import "./styles/main.scss";
+import "normalize.css";
+import "./scss/main.scss";
 
-console.log("start");
+import "./tmpl/index.html";
