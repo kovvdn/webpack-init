@@ -1,4 +1,5 @@
-import "normalize.css";
+import "minireset.css";
+
 import "./scss/main.scss";
 
-import "./tmpl/index.html";
+console.log("test");

@@ -1,13 +1,11 @@
-@import "mixins/_font-face.scss";
+@import "libs/variables";
+@import "libs/media";
 
 @import "base/fonts";
+@import "base/general";
 
-body {
-  background-color: lightblue;
-  font-family: notosans;
-  background-image: url("../images/bg.jpg");
-  a {
-    color: indianred;
-    text-decoration: none;
-  }
-}
+@import "components/button";
+@import "components/link";
+
+@import "layout/header";
+@import "layout/footer";

@@ -6,12 +6,8 @@
     <title>Webpack Starter</title>
   </head>
   <body>
-    <header class="header">
-      <h1>hui</h1>
-      <h2>pizda</h2>
-      <h3>djigurda</h3>
-      <h4>blyat'</h4>
-      <img src="../images/avatar.jpg" alt="" />
-    </header>
+    <%= require('html-loader!./partials/header.html') %>
+
+    <main class="content">content</main>
   </body>
 </html>

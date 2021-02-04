@@ -8,34 +8,84 @@ const TerserWebpackPlugin = require("terser-webpack-plugin");
 
 const ImageMinimizerWebpackPlugin = require("image-minimizer-webpack-plugin");
 
-// const CopyWebpackPlugin = require("copy-webpack-plugin");
+require("dotenv").config();
 
 const isDev = process.env.NODE_ENV === "development";
 const isProd = !isDev;
+
+const setPlugins = prod => {
+  const base = [
+    new HTMLWebpackPlugin({
+      template: path.resolve(__dirname, "src/tmpl/index.html"),
+      filename: "index.html",
+      minify: {
+        collapseWhitespace: isProd,
+      },
+    }),
+    new CleanWebpackPlugin(),
+    new MiniCssExtractPlugin({
+      filename: "./css/[name].css",
+    }),
+  ];
+
+  if (prod) {
+    base.push(
+      new ImageMinimizerWebpackPlugin({
+        minimizerOptions: {
+          plugins: [
+            ["gifsicle", { interlaced: true }],
+            ["jpegtran", { progressive: true }],
+            ["optipng", { optimizationLevel: 5 }],
+            [
+              "svgo",
+              {
+                plugins: [
+                  {
+                    removeViewBox: false,
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+      })
+    );
+  }
+  return base;
+};
+
+const setOptimizations = prod => {
+  const base = {
+    splitChunks: {
+      chunks: "all",
+    },
+  };
+
+  if (prod) {
+    base.minimizer = [
+      new OptimizeCSSAssetsWebpackplugin(),
+      new TerserWebpackPlugin(), // js compressor
+    ];
+  }
+
+  return base;
+};
 
 module.exports = {
   entry: "./src/index.js",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "./js/[name].bundle.js",
-    publicPath: "",
   },
+  mode: isProd ? "production" : "development",
   devtool: isProd ? false : "source-map",
-  optimization: {
-    splitChunks: {
-      chunks: "all",
-    },
-    minimizer: [
-      new OptimizeCSSAssetsWebpackplugin(),
-      new TerserWebpackPlugin(),
-    ],
-  },
+  optimization: setOptimizations(isProd),
   module: {
     rules: [
-      {
-        test: /\.html$/i,
-        loader: "html-loader",
-      },
+      // {
+      //   test: /\.html$/i,
+      //   loader: "html-loader", //use directly in .html file
+      // },
       {
         test: /\.m?js$/,
         exclude: /node_modules/,
@@ -48,12 +98,13 @@ module.exports = {
       },
       {
         test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
-        // type: "asset/resource",
         use: [
           {
             loader: "file-loader",
             options: {
-              name: "./img/[name].[ext]",
+              name: "[name].[ext]",
+              outputPath: "images",
+              publicPath: "../",
             },
           },
         ],
@@ -64,7 +115,9 @@ module.exports = {
           {
             loader: "file-loader",
             options: {
-              name: "./fonts/[name].[ext]",
+              name: "[name].[ext]",
+              outputPath: "fonts/",
+              publicPath: "../",
             },
           },
         ],
@@ -81,6 +134,7 @@ module.exports = {
             },
           },
           "css-loader",
+          "postcss-loader",
           "sass-loader",
         ],
       },
@@ -95,39 +149,8 @@ module.exports = {
     contentBase: path.join(__dirname, "dist"),
     compress: true,
     historyApiFallback: true,
-    hot: true,
+    // hot: true,
     open: true,
   },
-  plugins: [
-    new HTMLWebpackPlugin({
-      template: path.resolve(__dirname, "src/tmpl/index.html"),
-      filename: "index.html",
-      minify: {
-        collapseWhitespace: isProd,
-      },
-    }),
-    new CleanWebpackPlugin(),
-    new MiniCssExtractPlugin({
-      filename: "./css/[name].css",
-    }),
-    new ImageMinimizerWebpackPlugin({
-      minimizerOptions: {
-        plugins: [
-          ["gifsicle", { interlaced: true }],
-          ["jpegtran", { progressive: true }],
-          ["optipng", { optimizationLevel: 5 }],
-          [
-            "svgo",
-            {
-              plugins: [
-                {
-                  removeViewBox: false,
-                },
-              ],
-            },
-          ],
-        ],
-      },
-    }),
-  ],
+  plugins: setPlugins(isProd),
 };
