@@ -149,7 +149,6 @@ module.exports = {
     contentBase: path.join(__dirname, "dist"),
     compress: true,
     historyApiFallback: true,
-    // hot: true,
     open: true,
   },
   plugins: setPlugins(isProd),
